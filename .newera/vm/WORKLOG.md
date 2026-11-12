@@ -43,3 +43,6 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T13:39:36.253Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations && for w in shared gen.pollinations.ai media.pollinations.ai; do ec
 - [2026-11-12T13:40:04.511Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs && echo '=== run-pocs.mjs ===' && cat scripts/run-pocs.mjs && echo '=== list-pocs.mjs =
 - [2026-11-12T13:40:47.951Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations && echo '=== enter cfg 100-130 ===' && sed -n '100,130p' enter.poll
+- [2026-11-12T13:48:04.713Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations && echo '=== shared/vitest.config.ts ===' && cat shared/vitest.conf
+- [2026-11-12T13:48:50.534Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations && echo '=== monorepo root pkg ===' && node -p "JSON.stringify(requ
+- [2026-11-12T13:49:34.988Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations && echo '=== packages/auth/vitest.config.ts ===' && cat packages/au
