@@ -26,3 +26,4 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T12:46:11.442Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations ( cd gen.pollinations.ai && timeout 300 npx vitest run test/agent-r
 - [2026-11-12T12:48:34.148Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs ls node_modules | head -50 echo '--- vitest? ---'; ls node_modules/.bin 2>/dev/null | h
 - [2026-11-12T12:53:32.691Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations cat shared/vitest.config.ts; echo '=== shared pkg ==='; cat shared/
+- [2026-11-12T12:56:34.556Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs ls target/pollinations/node_modules | head -40 echo '--- jose ---'; ls -d target/pollin
