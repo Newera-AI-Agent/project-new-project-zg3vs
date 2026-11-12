@@ -28,3 +28,5 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T12:53:32.691Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations cat shared/vitest.config.ts; echo '=== shared pkg ==='; cat shared/
 - [2026-11-12T12:56:34.556Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs ls target/pollinations/node_modules | head -40 echo '--- jose ---'; ls -d target/pollin
 - [2026-11-12T13:00:07.009Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== all test files (non node_modules) ==='; find . -path ./no
+- [2026-11-12T13:12:21.562Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== validateUserMediaUrl call sites ==='; grep -rn "validateU
+- [2026-11-12T13:13:14.040Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== shared/user-media-url.ts ==='; cat -n shared/user-media-u
