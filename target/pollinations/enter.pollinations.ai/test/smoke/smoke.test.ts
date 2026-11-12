@@ -1,3 +1,4 @@
+import { SELF } from "cloudflare:test";
 import { expect } from "vitest";
 import { test } from "../fixtures.ts";
 
