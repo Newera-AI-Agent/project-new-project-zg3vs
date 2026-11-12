@@ -23,12 +23,14 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const TARGET = path.join(ROOT, "target", "pollinations");
 
-const WORKERS = ["enter", "gen", "media", "shared"];
+const WORKERS = ["enter", "gen", "media", "shared", "root"];
 const WORKER_DIR = {
     enter: "enter.pollinations.ai",
     gen: "gen.pollinations.ai",
     media: "media.pollinations.ai",
     shared: "shared",
+    // monorepo-root tier: packages/**, operations/**, apps/** (plain node)
+    root: ".",
 };
 
 const args = process.argv.slice(2);
@@ -64,12 +66,21 @@ const summary = [];
 
 for (const worker of selected) {
     const dir = path.join(TARGET, WORKER_DIR[worker]);
-    const pocDir = path.join(dir, "test", "poc");
+    const isRootTier = worker === "root";
+    const pocDir = isRootTier
+        ? path.join(dir, "poc")
+        : path.join(dir, "test", "poc");
     if (!existsSync(pocDir)) {
-        console.log(`[poc] ${worker}: no test/poc directory, skipping`);
+        console.log(`[poc] ${worker}: no PoC directory, skipping`);
         continue;
     }
-    const vitestArgs = ["run", "--dir", "test/poc", "--reporter=default"];
+    // Prefer an assessment-specific vitest config (never modifies upstream
+    // configs) so PoCs are actually collected: upstream shared/vitest.config.ts
+    // hardcodes `include` to two registry tests.
+    const pocConfig = path.join(dir, "vitest.poc.config.ts");
+    const vitestArgs = ["run", "--reporter=default"];
+    if (existsSync(pocConfig)) vitestArgs.push("--config", "vitest.poc.config.ts");
+    else vitestArgs.push("--dir", isRootTier ? "poc" : "test/poc");
     if (onlyFile) vitestArgs.push(onlyFile);
     console.log(
         `\n[poc] === ${worker} (${WORKER_DIR[worker]}) :: vitest ${vitestArgs.join(" ")} ===`,
