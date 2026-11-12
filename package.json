@@ -6,9 +6,10 @@
   "description": "Authorized ethical security assessment of pollinations/pollinations — verified PoCs and issue reports",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "vitest run --dir poc",
-    "poc": "vitest run --dir poc",
-    "poc:list": "node scripts/list-pocs.mjs"
+    "test": "node scripts/run-pocs.mjs",
+    "poc": "node scripts/run-pocs.mjs",
+    "poc:list": "node scripts/list-pocs.mjs",
+    "poc:one": "node scripts/run-pocs.mjs --file"
   },
   "devDependencies": {
     "tsx": "4.20.6",
