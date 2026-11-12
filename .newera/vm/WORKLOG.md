@@ -65,3 +65,4 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T15:08:08.609Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations && for w in enter.pollinations.ai gen.pollinations.ai media.pollina
 - [2026-11-12T15:12:29.196Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs && echo '=== contract files ===' && ls .newera/vm/ && grep -rl 'R1' .newera/vm/*.json .
 - [2026-11-12T15:12:52.239Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations/media.pollinations.ai && timeout 400 npx vitest run test/poc/wave00
+- [2026-11-12T15:15:16.472Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs && echo '=== shared vitest.poc.config.ts ===' && cat target/pollinations/shared/vitest.
