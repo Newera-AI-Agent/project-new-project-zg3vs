@@ -1,0 +1,16 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { Device } from "../components/auth/device.tsx";
+import { pageTitle } from "../page-meta.ts";
+
+export const Route = createFileRoute("/device")({
+    head: () => ({ meta: [{ title: pageTitle("/device") }] }),
+    component: RouteComponent,
+    validateSearch: (search: Record<string, unknown>) => ({
+        user_code: (search.user_code as string) || "",
+    }),
+});
+
+function RouteComponent() {
+    const { user_code } = Route.useSearch();
+    return <Device prefilledCode={user_code} />;
+}

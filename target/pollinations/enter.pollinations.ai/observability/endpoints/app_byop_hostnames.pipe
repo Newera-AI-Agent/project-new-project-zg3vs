@@ -1,0 +1,25 @@
+DESCRIPTION >
+    Get distinct BYOP apps from the last 90 days.
+    Requests through an App Key name the catalog listing credited by
+    app_key_listings: its URL and owner's GitHub ID. Requests without an App
+    Key name the key's hostname (key name heuristic) with an empty GitHub ID.
+
+TOKEN tinybird_read READ
+
+NODE app_byop_hostnames_node
+SQL >
+    SELECT DISTINCT
+        apps.app_url AS app_url,
+        if(ge.api_key_client_id IN ('', 'undefined'), ge.api_key_name, '') AS hostname,
+        apps.github_user_id AS github_user_id
+    FROM generation_event_v2 ge
+    LEFT JOIN app_key_listings apps
+        ON ge.api_key_client_id = apps.app_key_id
+    WHERE ge.start_time > now() - INTERVAL 90 DAY
+      AND (
+        ge.api_key_created_via = 'redirect-auth'
+        OR (ge.api_key_type = 'secret' AND ge.api_key_name LIKE '%.%')
+      )
+      AND (app_url != '' OR hostname != '')
+
+TYPE endpoint

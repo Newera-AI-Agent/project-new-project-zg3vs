@@ -1,0 +1,18 @@
+{
+  "engagement": "Authorized ethical security assessment of pollinations/pollinations (open-source monorepo). Owner-approved: source review + PoC construction + local execution.",
+  "targets": [
+    "http://127.0.0.1:*",
+    "http://localhost:*"
+  ],
+  "scope_notes": [
+    "NO live production scanning of pollinations.ai / gen.pollinations.ai / media.pollinations.ai / enter.pollinations.ai is performed.",
+    "All PoCs execute against the vendored upstream source locally (unit/integration harness, loopback servers).",
+    "No denial-of-service, no bulk resource exhaustion, no credential use against third parties, no live data mutation.",
+    "Findings are reported privately as markdown issue files in this repository only; no PR to the upstream public repo."
+  ],
+  "out_of_scope": [
+    "Any exploitation of live pollinations infrastructure",
+    "Social engineering / phishing of real users",
+    "Third-party provider abuse (Stripe, Replicate, fal, E2B, Exa)"
+  ]
+}

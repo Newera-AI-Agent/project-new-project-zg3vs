@@ -1,0 +1,41 @@
+name: Data / Sync D1 to Tinybird
+
+on:
+  schedule:
+    # Every 4 hours (00:23, 04:23, ... UTC): KPI signups read d1_user, so they
+    # lag D1 by at most about 4 hours plus the KPI Worker's 30-minute cache.
+    - cron: "23 */4 * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: d1-tinybird-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # One table at a time: two parallel page streams were paging prod D1
+      # when it stalled on 2026-11-10 12:30 UTC.
+      max-parallel: 1
+      matrix:
+        datasource:
+          - d1_user
+          - d1_apikey
+          - d1_community_model
+          - d1_session
+          - d1_account
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Sync ${{ matrix.datasource }}
+        env:
+          DATASOURCE: ${{ matrix.datasource }}
+          EXPORT_TOKEN: ${{ secrets.D1_EXPORT_TOKEN }}
+          TINYBIRD_TOKEN: ${{ secrets.TINYBIRD_SYNC_TOKEN }}
+          TINYBIRD_READ_TOKEN: ${{ secrets.TINYBIRD_READ_TOKEN }}
+        run: bash operations/data-sync/d1-to-tinybird.sh

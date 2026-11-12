@@ -1,0 +1,46 @@
+{
+  "name": "pollinations-mcp",
+  "main": "worker.js",
+  "compatibility_date": "2026-08-14",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "routes": [
+    {
+      "pattern": "mcp.myceli.ai",
+      "zone_name": "myceli.ai",
+      "custom_domain": true
+    },
+    {
+      "pattern": "mcp.pollinations.ai",
+      "zone_name": "pollinations.ai",
+      "custom_domain": true
+    }
+  ],
+  // Per client IP, before tool calls reach Gen and Enter's D1; see worker.js.
+  // Gen forwards its callers' IPs. Oct 20-27: busiest direct client 290
+  // requests in a minute; the whole Worker, Gen included, peaked at 673.
+  // Namespace 1007 is MCP's own; staging shares it, as in Gen and Enter.
+  "ratelimits": [
+    {
+      "name": "IP_RATE_LIMITER",
+      "namespace_id": "1007",
+      "simple": { "limit": 200, "period": 10 }
+    }
+  ],
+  "observability": { "enabled": true },
+  "env": {
+    "staging": {
+      "name": "pollinations-mcp-staging",
+      "workers_dev": false,
+      "routes": [],
+      "vars": { "POLLINATIONS_BASE_URL": "https://staging.gen.pollinations.ai" },
+      "ratelimits": [
+        {
+          "name": "IP_RATE_LIMITER",
+          "namespace_id": "1007",
+          "simple": { "limit": 200, "period": 10 }
+        }
+      ],
+      "observability": { "enabled": true }
+    }
+  }
+}

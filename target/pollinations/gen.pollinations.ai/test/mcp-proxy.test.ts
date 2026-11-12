@@ -1,0 +1,752 @@
+import { env, SELF } from "cloudflare:test";
+import { signAgentRunToken } from "@shared/auth/agent-run-token.ts";
+import { signSessionToken } from "@shared/auth/session-token.ts";
+import { getUserBalance } from "@shared/billing/balance.ts";
+import {
+    MCP_SERVERS,
+    MCP_USAGE_HEADERS,
+    type McpServerDefinition,
+} from "@shared/registry/mcp.ts";
+import { createTestApiKey, test } from "@shared/test/fixtures/index.ts";
+import { drizzle } from "drizzle-orm/d1";
+import { expect } from "vitest";
+
+const MCP_REQUEST = {
+    jsonrpc: "2.0",
+    id: 1,
+    method: "tools/call",
+    params: {
+        name: "listModels",
+        arguments: {},
+    },
+};
+
+test("lists the MCP servers exposed through Gen", async () => {
+    const response = await SELF.fetch("https://gen.pollinations.ai/mcp");
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+        data: [
+            {
+                id: "pollinations",
+                alpha: true,
+                name: "Pollinations",
+                description:
+                    "Access Pollinations models and API capabilities through agent tools.",
+                url: "https://gen.pollinations.ai/mcp/pollinations",
+                pricing: {
+                    description:
+                        "Generation tools use each selected model's listed rate. Discovery and account tools are free.",
+                    rates: [],
+                },
+            },
+            {
+                id: "ask-jev",
+                alpha: true,
+                name: "Ask Jev",
+                description:
+                    "Evaluate state with typed choice, score, and probability questions.",
+                url: "https://gen.pollinations.ai/mcp/ask-jev",
+                pricing: {
+                    description:
+                        "Decision tools use the selected decision model's listed rate, Jev by default. No additional MCP fee.",
+                    rates: [],
+                },
+            },
+            {
+                id: "ffmpeg",
+                alpha: true,
+                name: "FFmpeg",
+                description:
+                    "Trim, convert, resize, compress, and remix audio and video.",
+                url: "https://gen.pollinations.ai/mcp/ffmpeg",
+                pricing: {
+                    rates: [
+                        {
+                            name: "cloudflare.container.basic_runtime.v1",
+                            label: "Runtime",
+                            kind: "compute",
+                            price: "0.00000778",
+                            currency: "pollen",
+                            quantity: 1,
+                            unit: "second",
+                        },
+                    ],
+                },
+            },
+            {
+                id: "exa",
+                alpha: true,
+                name: "Exa Search",
+                description:
+                    "Search the live web and fetch clean content from source pages.",
+                url: "https://gen.pollinations.ai/mcp/exa",
+                pricing: {
+                    rates: [
+                        {
+                            name: "exa.search.v1",
+                            label: "Search",
+                            kind: "search_request",
+                            price: "0.007",
+                            currency: "pollen",
+                            quantity: 1,
+                            unit: "request",
+                            suffix: "up to 10 results",
+                        },
+                        {
+                            name: "exa.contents.text.v1",
+                            label: "Fetch",
+                            kind: "page",
+                            price: "0.001",
+                            currency: "pollen",
+                            quantity: 1,
+                            unit: "page",
+                        },
+                    ],
+                },
+            },
+            {
+                id: "composio",
+                alpha: true,
+                name: "Connectors",
+                description:
+                    "Read Gmail, read and commit to GitHub, update Sheets, and post to Slack through Composio. Each user connects their own accounts when needed.",
+                url: "https://gen.pollinations.ai/mcp/composio",
+                pricing: {
+                    description: "Launch price",
+                    rates: [
+                        {
+                            name: "composio.tool_call.v1",
+                            label: "Tool call",
+                            kind: "tool_call",
+                            price: "0.0002",
+                            currency: "pollen",
+                            quantity: 1,
+                            unit: "call",
+                        },
+                    ],
+                },
+            },
+            {
+                id: "computer",
+                alpha: true,
+                name: "Computer",
+                description:
+                    "A private persistent computer: files that survive between runs, a bash shell and JavaScript.",
+                url: "https://gen.pollinations.ai/mcp/computer",
+                pricing: {
+                    description: "Preview price",
+                    rates: [
+                        {
+                            name: "computer.tool_call.v1",
+                            label: "Tool call",
+                            kind: "tool_call",
+                            price: "0.0002",
+                            currency: "pollen",
+                            quantity: 1,
+                            unit: "call",
+                        },
+                    ],
+                },
+            },
+            {
+                id: "machines",
+                alpha: true,
+                name: "Machines",
+                description:
+                    "Start, pause, resume, and run commands and file operations in Linux sandboxes.",
+                url: "https://gen.pollinations.ai/mcp/machines",
+                pricing: {
+                    description:
+                        "Sandboxes bill per running second while active; paused sandboxes cost nothing. No additional MCP fee.",
+                    rates: [],
+                },
+            },
+            {
+                id: "calculators",
+                alpha: true,
+                name: "Calculators",
+                description:
+                    "Time, cron schedules, Unicode, color contrast, QR codes, text hashes, and ECB currency rates.",
+                url: "https://gen.pollinations.ai/mcp/calculators",
+                pricing: {
+                    description:
+                        "Local utilities and public ECB rates. No Pollen charge.",
+                    rates: [],
+                },
+            },
+            {
+                id: "network",
+                alpha: true,
+                name: "Network",
+                description:
+                    "Public DNS records, HTTP diagnostics, IPv4/IPv6 subnets and RDAP registration data.",
+                url: "https://gen.pollinations.ai/mcp/network",
+                pricing: {
+                    description: "Network diagnostics. No Pollen charge.",
+                    rates: [],
+                },
+            },
+            {
+                id: "packages",
+                alpha: true,
+                name: "Packages",
+                description:
+                    "Package versions, known vulnerabilities and public Hugging Face models and Spaces.",
+                url: "https://gen.pollinations.ai/mcp/packages",
+                pricing: {
+                    description: "Public registry lookups. No Pollen charge.",
+                    rates: [],
+                },
+            },
+            {
+                id: "news",
+                alpha: true,
+                name: "News & Feeds",
+                description:
+                    "Hacker News, RSS/Atom feeds, archived snapshots and USGS earthquakes.",
+                url: "https://gen.pollinations.ai/mcp/news",
+                pricing: {
+                    description: "Free public sources. Upstream limits apply.",
+                    rates: [],
+                },
+            },
+            {
+                id: "research",
+                alpha: true,
+                name: "Research",
+                description:
+                    "Wikipedia, Wiktionary, Wikidata, RFCs, biomedical literature, arXiv, Crossref and World Bank data.",
+                url: "https://gen.pollinations.ai/mcp/research",
+                pricing: {
+                    description:
+                        "Research lookups are free. No additional MCP fee.",
+                    rates: [],
+                },
+            },
+        ],
+    });
+});
+
+test("routes Pollinations MCP with caller authorization for downstream billing", async () => {
+    const { key, userId } = await createTestApiKey({
+        user: { tierBalance: 1 },
+    });
+    const response = await SELF.fetch(
+        "https://gen.pollinations.ai/mcp/pollinations",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${key}`,
+                Cookie: "session=private",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(MCP_REQUEST),
+        },
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+        jsonrpc: "2.0",
+        id: 1,
+        result: {
+            content: [{ type: "text", text: "pollinations proxied" }],
+        },
+    });
+    expect(await getUserBalance(drizzle(env.DB), userId)).toEqual({
+        tierBalance: 1,
+        packBalance: 0,
+    });
+});
+
+test("routes Ask Jev with caller authorization without an extra MCP debit", async () => {
+    const { key, userId } = await createTestApiKey({
+        user: { tierBalance: 1 },
+    });
+    const payload = {
+        jsonrpc: "2.0",
+        id: 1,
+        method: "tools/call",
+        params: {
+            name: "jev_decide",
+            arguments: {
+                state: "The invoice is paid.",
+                questions: {
+                    paid: { type: "noul", instructions: "Is it paid?" },
+                },
+            },
+        },
+    };
+    const response = await SELF.fetch(
+        "https://gen.pollinations.ai/mcp/ask-jev",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${key}`,
+                Cookie: "session=private",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        },
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+        pathname: "/",
+        authorization: `Bearer ${key}`,
+        cookie: null,
+        payload,
+    });
+    expect(await getUserBalance(drizzle(env.DB), userId)).toEqual({
+        tierBalance: 1,
+        packBalance: 0,
+    });
+});
+
+test("routes Machines with caller authorization without an extra MCP debit", async () => {
+    const { key, userId } = await createTestApiKey({
+        user: { tierBalance: 1 },
+    });
+    const payload = {
+        jsonrpc: "2.0",
+        id: 1,
+        method: "tools/call",
+        params: { name: "list_sandboxes", arguments: {} },
+    };
+    const response = await SELF.fetch(
+        "https://gen.pollinations.ai/mcp/machines",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${key}`,
+                Cookie: "session=private",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        },
+    );
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+        pathname: "/",
+        authorization: `Bearer ${key}`,
+        cookie: null,
+        payload,
+    });
+    expect(await getUserBalance(drizzle(env.DB), userId)).toEqual({
+        tierBalance: 1,
+        packBalance: 0,
+    });
+});
+
+test.for(MCP_SERVERS.map(({ id }) => id))(
+    "requires a Pollinations credential before invoking %s",
+    async (serverId) => {
+        const response = await SELF.fetch(
+            `https://gen.pollinations.ai/mcp/${serverId}`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(MCP_REQUEST),
+            },
+        );
+        expect(response.status).toBe(401);
+    },
+);
+
+test.for(
+    MCP_SERVERS.filter(
+        (server: McpServerDefinition) =>
+            server.billing === "downstream" &&
+            server.forwardAuthorization !== true,
+    ).map(({ id }) => id),
+)(
+    "free %s strips caller credentials and remains callable with zero balance",
+    async (serverId) => {
+        const { key, userId } = await createTestApiKey({
+            user: { tierBalance: 0, packBalance: 0 },
+        });
+        const payload = {
+            ...MCP_REQUEST,
+            params: { name: "opaque_proxy_test", arguments: {} },
+        };
+        const response = await SELF.fetch(
+            `https://gen.pollinations.ai/mcp/${serverId}`,
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${key}`,
+                    Cookie: "session=private",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            },
+        );
+        expect(response.status).toBe(200);
+        expect(await response.json()).toEqual({
+            pathname: "/",
+            authorization: null,
+            cookie: null,
+            payload,
+        });
+        expect(await getUserBalance(drizzle(env.DB), userId)).toEqual({
+            tierBalance: 0,
+            packBalance: 0,
+        });
+    },
+);
+
+test("proxies FFmpeg without caller credentials and bills reported usage", async () => {
+    const { key, userId } = await createTestApiKey({
+        user: { tierBalance: 1 },
+    });
+    const response = await SELF.fetch(
+        "https://gen.pollinations.ai/mcp/ffmpeg",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${key}`,
+                Cookie: "session=private",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(MCP_REQUEST),
+        },
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+        jsonrpc: "2.0",
+        id: 1,
+        result: {
+            content: [{ type: "text", text: "ffmpeg proxied" }],
+        },
+    });
+    for (const header of Object.values(MCP_USAGE_HEADERS)) {
+        expect(response.headers.has(header)).toBe(false);
+    }
+    expect(await getUserBalance(drizzle(env.DB), userId)).toEqual({
+        tierBalance: 0.75,
+        packBalance: 0,
+    });
+});
+
+test("proxies Exa without caller credentials and bills reported usage", async () => {
+    const { key, userId } = await createTestApiKey({
+        user: { tierBalance: 1 },
+    });
+    const response = await SELF.fetch("https://gen.pollinations.ai/mcp/exa", {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${key}`,
+            Cookie: "session=private",
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(MCP_REQUEST),
+    });
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+        jsonrpc: "2.0",
+        id: 1,
+        result: {
+            content: [{ type: "text", text: "exa proxied" }],
+        },
+    });
+    for (const header of Object.values(MCP_USAGE_HEADERS)) {
+        expect(response.headers.has(header)).toBe(false);
+    }
+    expect(await getUserBalance(drizzle(env.DB), userId)).toEqual({
+        tierBalance: 0.993,
+        packBalance: 0,
+    });
+});
+
+test("routes Composio with the authenticated user", async () => {
+    const { key, userId } = await createTestApiKey({
+        user: { tierBalance: 1 },
+    });
+    const response = await SELF.fetch(
+        "https://gen.pollinations.ai/mcp/composio",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${key}`,
+                Cookie: "session=private",
+                "x-pollinations-user-id": "spoofed-user",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(MCP_REQUEST),
+        },
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+        jsonrpc: "2.0",
+        id: 1,
+        result: { content: [{ type: "text", text: userId }] },
+    });
+});
+
+test("routes Computer with the authenticated user and bills the flat call rate", async () => {
+    const { key, userId } = await createTestApiKey({
+        user: { tierBalance: 1, githubId: 583231, githubUsername: "octocat" },
+    });
+    const response = await SELF.fetch(
+        "https://gen.pollinations.ai/mcp/computer",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${key}`,
+                Cookie: "session=private",
+                "x-pollinations-user-id": "spoofed-user",
+                "x-pollinations-user-github": "1+spoofed",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(MCP_REQUEST),
+        },
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+        jsonrpc: "2.0",
+        id: 1,
+        result: {
+            content: [
+                { type: "text", text: `computer:${userId}:583231+octocat` },
+            ],
+        },
+    });
+    for (const header of Object.values(MCP_USAGE_HEADERS)) {
+        expect(response.headers.has(header)).toBe(false);
+    }
+    expect(await getUserBalance(drizzle(env.DB), userId)).toEqual({
+        tierBalance: 0.9998,
+        packBalance: 0,
+    });
+});
+
+test("refuses agent run tokens on Connectors", async () => {
+    const parent = await createTestApiKey({
+        user: { tierBalance: 1 },
+    });
+    const token = await signAgentRunToken({
+        secret: env.BETTER_AUTH_SECRET,
+        parentApiKeyId: parent.id,
+        parentRequestId: crypto.randomUUID(),
+    });
+    const response = await SELF.fetch(
+        "https://gen.pollinations.ai/mcp/composio",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(MCP_REQUEST),
+        },
+    );
+
+    expect(response.status).toBe(403);
+});
+
+test("gives each agent its own Computer on the account, kept across runs", async () => {
+    const parent = await createTestApiKey({
+        user: { tierBalance: 1 },
+    });
+    const computerFor = async (authorization: string) => {
+        const response = await SELF.fetch(
+            "https://gen.pollinations.ai/mcp/computer",
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${authorization}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(MCP_REQUEST),
+            },
+        );
+        expect(response.status).toBe(200);
+        return response.text();
+    };
+    const runOf = (agentModelId: string) =>
+        signAgentRunToken({
+            secret: env.BETTER_AUTH_SECRET,
+            parentApiKeyId: parent.id,
+            parentRequestId: crypto.randomUUID(),
+            agentModelId,
+        });
+
+    const agentOne = await computerFor(
+        await runOf("community/owner/agent-one"),
+    );
+    expect(agentOne).toContain(
+        `computer:${parent.userId}:agent:community/owner/agent-one:`,
+    );
+    expect(await computerFor(await runOf("community/owner/agent-one"))).toBe(
+        agentOne,
+    );
+    expect(
+        await computerFor(await runOf("community/owner/agent-two")),
+    ).not.toBe(agentOne);
+    expect(await computerFor(parent.key)).not.toBe(agentOne);
+});
+
+test.for(["composio", "computer"])(
+    "routes the account owner's dashboard session to %s",
+    async (serverId) => {
+        const { userId } = await createTestApiKey({
+            user: { tierBalance: 1 },
+        });
+        const token = await signSessionToken({
+            secret: env.BETTER_AUTH_SECRET,
+            userId,
+        });
+        const response = await SELF.fetch(
+            `https://gen.pollinations.ai/mcp/${serverId}`,
+            {
+                method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(MCP_REQUEST),
+            },
+        );
+
+        expect(response.status).toBe(200);
+        expect(await response.text()).toContain(userId);
+    },
+);
+
+test("refuses receipt-billed tool calls from an empty wallet but keeps initialization free", async () => {
+    const { key } = await createTestApiKey();
+    const callFfmpeg = (body: unknown) =>
+        SELF.fetch("https://gen.pollinations.ai/mcp/ffmpeg", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${key}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        });
+
+    const refused = await callFfmpeg(MCP_REQUEST);
+    expect(refused.status).toBe(402);
+    expect(await refused.json()).toMatchObject({
+        error: { code: "INSUFFICIENT_BALANCE" },
+    });
+    const initialized = await callFfmpeg({
+        jsonrpc: "2.0",
+        id: 1,
+        method: "initialize",
+        params: {},
+    });
+    expect(initialized.status).toBe(200);
+});
+
+test("refuses receipt-billed tool calls from a key with no budget left", async () => {
+    const { key, userId } = await createTestApiKey({
+        user: { tierBalance: 10, packBalance: 0 },
+        pollenBudget: 0,
+    });
+    const response = await SELF.fetch(
+        "https://gen.pollinations.ai/mcp/ffmpeg",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${key}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(MCP_REQUEST),
+        },
+    );
+
+    expect(response.status).toBe(402);
+    expect(await response.json()).toMatchObject({
+        error: { code: "KEY_BUDGET_EXHAUSTED" },
+    });
+    expect(await getUserBalance(drizzle(env.DB), userId)).toEqual({
+        tierBalance: 10,
+        packBalance: 0,
+    });
+});
+
+test("refuses tool calls from a Quest Pollen only key without Quest Pollen", async () => {
+    const { key, userId } = await createTestApiKey({
+        user: { tierBalance: 0, packBalance: 10 },
+        questPollenOnly: true,
+    });
+    const response = await SELF.fetch(
+        "https://gen.pollinations.ai/mcp/ffmpeg",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${key}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(MCP_REQUEST),
+        },
+    );
+
+    expect(response.status).toBe(402);
+    expect(await response.json()).toMatchObject({
+        error: { code: "QUEST_POLLEN_ONLY" },
+    });
+    expect(await getUserBalance(drizzle(env.DB), userId)).toEqual({
+        tierBalance: 0,
+        packBalance: 10,
+    });
+});
+
+test("rejects MCP batch requests at the proxy", async () => {
+    const { key } = await createTestApiKey();
+    const response = await SELF.fetch(
+        "https://gen.pollinations.ai/mcp/pollinations",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${key}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify([MCP_REQUEST]),
+        },
+    );
+
+    expect(response.status).toBe(400);
+});
+
+test("bills FFmpeg MCP usage when authorized with an ag_ run token", async () => {
+    const parent = await createTestApiKey({
+        user: { tierBalance: 1 },
+    });
+    const token = await signAgentRunToken({
+        secret: env.BETTER_AUTH_SECRET,
+        parentApiKeyId: parent.id,
+        parentRequestId: crypto.randomUUID(),
+    });
+
+    const response = await SELF.fetch(
+        "https://gen.pollinations.ai/mcp/ffmpeg",
+        {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(MCP_REQUEST),
+        },
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+        jsonrpc: "2.0",
+        id: 1,
+        result: {
+            content: [{ type: "text", text: "ffmpeg proxied" }],
+        },
+    });
+    for (const header of Object.values(MCP_USAGE_HEADERS)) {
+        expect(response.headers.has(header)).toBe(false);
+    }
+    expect(await getUserBalance(drizzle(env.DB), parent.userId)).toEqual({
+        tierBalance: 0.75,
+        packBalance: 0,
+    });
+});

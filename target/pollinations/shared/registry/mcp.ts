@@ -1,0 +1,337 @@
+import {
+    type BillingRateDefinition,
+    type PublicPriceInfo,
+    publicPriceInfo,
+} from "./public-pricing.ts";
+
+export const MCP_USAGE_HEADERS = {
+    cost: "x-pollinations-mcp-cost",
+    tool: "x-pollinations-mcp-tool",
+    status: "x-pollinations-mcp-status",
+    adjustmentId: "x-pollinations-mcp-adjustment-id",
+    adjustmentUnits: "x-pollinations-mcp-adjustment-units",
+    error: "x-pollinations-mcp-error",
+} as const;
+
+// Gen overwrites this header before forwarding a user-scoped MCP request.
+// Private MCP Workers use it to select the caller's connected accounts.
+export const MCP_USER_ID_HEADER = "x-pollinations-user-id";
+// The caller's linked GitHub account as `id+username`, the local part of its
+// noreply address. Gen overwrites it too.
+export const MCP_USER_GITHUB_HEADER = "x-pollinations-user-github";
+
+type McpServerDefinitionBase = {
+    id: string;
+    name: string;
+    description: string;
+    /** Experimental server; uses the same maturity flag as model catalogs. */
+    alpha?: boolean;
+    /** Forward the caller key only when this server calls Gen on their behalf. */
+    forwardAuthorization?: true;
+    binding: McpBindingName;
+    pricing: McpPricingDefinition;
+    userScoped?: boolean;
+    /** Agents run code their author wrote, so their run tokens are refused. */
+    agents?: false;
+    accountPath?: string;
+};
+
+type McpPricingDefinition = {
+    description?: string;
+    rates: readonly BillingRateDefinition[];
+};
+
+export type McpPricingInfo = {
+    description?: string;
+    rates: PublicPriceInfo[];
+};
+
+export type McpBindingName =
+    | "POLLINATIONS_MCP"
+    | "ASK_JEV_MCP"
+    | "FFMPEG_MCP"
+    | "EXA_MCP"
+    | "COMPOSIO_MCP"
+    | "COMPUTER_MCP"
+    | "MACHINES_MCP"
+    | "CALCULATORS_MCP"
+    | "NETWORK_MCP"
+    | "PACKAGES_MCP"
+    | "NEWS_MCP"
+    | "RESEARCH_MCP";
+
+export type McpServerDefinition = McpServerDefinitionBase &
+    (
+        | { billing: "downstream" }
+        | {
+              billing: "usage_receipt";
+              provider: string;
+          }
+    );
+
+export const FFMPEG_MCP_PRICE_PER_SECOND =
+    0.25 * 0.00002 + 1 * 0.0000025 + 4 * 0.00000007;
+
+const EXA_SEARCH_PRICE_PER_REQUEST = 0.007;
+const EXA_CONTENTS_PRICE_PER_PAGE = 0.001;
+export const COMPOSIO_TOOL_CALL_PRICE = 0.0002;
+export const COMPUTER_TOOL_CALL_PRICE = 0.0002;
+const COMPUTER_MCP_PRICING = {
+    description: "Preview price",
+    rates: [
+        {
+            id: "computer.tool_call.v1",
+            description: "Computer tool call",
+            kind: "tool_call",
+            unit: "call",
+            unitCost: COMPUTER_TOOL_CALL_PRICE,
+            publicPricing: {
+                label: "Tool call",
+                quantity: 1,
+                unit: "call",
+            },
+        },
+    ],
+} as const;
+const COMPOSIO_MCP_PRICING = {
+    description: "Launch price",
+    rates: [
+        {
+            id: "composio.tool_call.v1",
+            description: "Connected app tool call",
+            kind: "tool_call",
+            unit: "call",
+            unitCost: COMPOSIO_TOOL_CALL_PRICE,
+            publicPricing: {
+                label: "Tool call",
+                quantity: 1,
+                unit: "call",
+            },
+        },
+    ],
+} as const;
+
+export const MCP_SERVERS = [
+    {
+        id: "pollinations",
+        alpha: true,
+        forwardAuthorization: true,
+        name: "Pollinations",
+        description:
+            "Access Pollinations models and API capabilities through agent tools.",
+        binding: "POLLINATIONS_MCP",
+        billing: "downstream",
+        pricing: {
+            description:
+                "Generation tools use each selected model's listed rate. Discovery and account tools are free.",
+            rates: [],
+        },
+    },
+    {
+        id: "ask-jev",
+        alpha: true,
+        forwardAuthorization: true,
+        name: "Ask Jev",
+        description:
+            "Evaluate state with typed choice, score, and probability questions.",
+        binding: "ASK_JEV_MCP",
+        billing: "downstream",
+        pricing: {
+            description:
+                "Decision tools use the selected decision model's listed rate, Jev by default. No additional MCP fee.",
+            rates: [],
+        },
+    },
+    {
+        id: "ffmpeg",
+        alpha: true,
+        name: "FFmpeg",
+        description:
+            "Trim, convert, resize, compress, and remix audio and video.",
+        binding: "FFMPEG_MCP",
+        billing: "usage_receipt",
+        provider: "cloudflare",
+        pricing: {
+            rates: [
+                {
+                    id: "cloudflare.container.basic_runtime.v1",
+                    description: "Cloudflare container runtime",
+                    kind: "compute",
+                    unit: "second",
+                    unitCost: FFMPEG_MCP_PRICE_PER_SECOND,
+                    publicPricing: {
+                        label: "Runtime",
+                        quantity: 1,
+                        unit: "second",
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: "exa",
+        alpha: true,
+        name: "Exa Search",
+        description:
+            "Search the live web and fetch clean content from source pages.",
+        binding: "EXA_MCP",
+        billing: "usage_receipt",
+        provider: "exa",
+        pricing: {
+            rates: [
+                {
+                    id: "exa.search.v1",
+                    description: "Exa auto search request",
+                    kind: "search_request",
+                    unit: "request",
+                    unitCost: EXA_SEARCH_PRICE_PER_REQUEST,
+                    publicPricing: {
+                        label: "Search",
+                        quantity: 1,
+                        unit: "request",
+                        suffix: "up to 10 results",
+                    },
+                },
+                {
+                    id: "exa.contents.text.v1",
+                    description: "Exa text contents page",
+                    kind: "page",
+                    unit: "page",
+                    unitCost: EXA_CONTENTS_PRICE_PER_PAGE,
+                    publicPricing: {
+                        label: "Fetch",
+                        quantity: 1,
+                        unit: "page",
+                    },
+                },
+            ],
+        },
+    },
+    {
+        id: "composio",
+        alpha: true,
+        name: "Connectors",
+        description:
+            "Read Gmail, read and commit to GitHub, update Sheets, and post to Slack through Composio. Each user connects their own accounts when needed.",
+        binding: "COMPOSIO_MCP",
+        billing: "usage_receipt",
+        provider: "composio",
+        userScoped: true,
+        agents: false,
+        accountPath: "/account#connectors",
+        pricing: COMPOSIO_MCP_PRICING,
+    },
+    {
+        id: "computer",
+        alpha: true,
+        name: "Computer",
+        description:
+            "A private persistent computer: files that survive between runs, a bash shell and JavaScript.",
+        binding: "COMPUTER_MCP",
+        billing: "usage_receipt",
+        provider: "cloudflare",
+        userScoped: true,
+        pricing: COMPUTER_MCP_PRICING,
+    },
+    {
+        id: "machines",
+        alpha: true,
+        forwardAuthorization: true,
+        name: "Machines",
+        description:
+            "Start, pause, resume, and run commands and file operations in Linux sandboxes.",
+        binding: "MACHINES_MCP",
+        billing: "downstream",
+        pricing: {
+            description:
+                "Sandboxes bill per running second while active; paused sandboxes cost nothing. No additional MCP fee.",
+            rates: [],
+        },
+    },
+    {
+        id: "calculators",
+        alpha: true,
+        name: "Calculators",
+        description:
+            "Time, cron schedules, Unicode, color contrast, QR codes, text hashes, and ECB currency rates.",
+        binding: "CALCULATORS_MCP",
+        billing: "downstream",
+        pricing: {
+            description:
+                "Local utilities and public ECB rates. No Pollen charge.",
+            rates: [],
+        },
+    },
+    {
+        id: "network",
+        alpha: true,
+        name: "Network",
+        description:
+            "Public DNS records, HTTP diagnostics, IPv4/IPv6 subnets and RDAP registration data.",
+        binding: "NETWORK_MCP",
+        billing: "downstream",
+        pricing: {
+            description: "Network diagnostics. No Pollen charge.",
+            rates: [],
+        },
+    },
+    {
+        id: "packages",
+        alpha: true,
+        name: "Packages",
+        description:
+            "Package versions, known vulnerabilities and public Hugging Face models and Spaces.",
+        binding: "PACKAGES_MCP",
+        billing: "downstream",
+        pricing: {
+            description: "Public registry lookups. No Pollen charge.",
+            rates: [],
+        },
+    },
+    {
+        id: "news",
+        alpha: true,
+        name: "News & Feeds",
+        description:
+            "Hacker News, RSS/Atom feeds, archived snapshots and USGS earthquakes.",
+        binding: "NEWS_MCP",
+        billing: "downstream",
+        pricing: {
+            description: "Free public sources. Upstream limits apply.",
+            rates: [],
+        },
+    },
+    {
+        id: "research",
+        alpha: true,
+        name: "Research",
+        description:
+            "Wikipedia, Wiktionary, Wikidata, RFCs, biomedical literature, arXiv, Crossref and World Bank data.",
+        binding: "RESEARCH_MCP",
+        billing: "downstream",
+        pricing: {
+            description: "Research lookups are free. No additional MCP fee.",
+            rates: [],
+        },
+    },
+] as const satisfies readonly McpServerDefinition[];
+
+export type McpServerId = (typeof MCP_SERVERS)[number]["id"];
+
+/** The servers a hosted agent can be given. */
+export const AGENT_MCP_SERVER_IDS = MCP_SERVERS.filter(
+    (server: McpServerDefinition) => server.agents !== false,
+).map(({ id }) => id) as [McpServerId, ...McpServerId[]];
+
+export function getMcpServerDefinition(
+    id: string,
+): McpServerDefinition | undefined {
+    return MCP_SERVERS.find((server) => server.id === id);
+}
+
+export function getMcpPricingInfo(server: McpServerDefinition): McpPricingInfo {
+    return {
+        description: server.pricing.description,
+        rates: server.pricing.rates.map((rate) => publicPriceInfo(rate)),
+    };
+}

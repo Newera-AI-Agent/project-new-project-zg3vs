@@ -1,0 +1,213 @@
+import { createBalanceCheckResult } from "@shared/billing/balance.ts";
+import {
+    atomicAdjustApiKeyBalance,
+    atomicReserveApiKeyBalance,
+} from "@shared/billing/deduction.ts";
+import { getFundedUserBalance } from "@shared/billing/internal-automation.ts";
+import { withByopMarkup } from "@shared/billing/markup.ts";
+import { PaymentRequiredError } from "@shared/http/payment-required-error.ts";
+import { isFreeModel } from "@shared/registry/registry.ts";
+import { getModelStats } from "@shared/utils/model-stats.ts";
+import { drizzle } from "drizzle-orm/d1";
+import type { Context } from "hono";
+import { createMiddleware } from "hono/factory";
+import type { Env } from "@/env.ts";
+import type { FallbackCandidate } from "@/fallback.ts";
+import type { AuthVariables } from "@/middleware/auth.ts";
+import type { BalanceVariables } from "@/middleware/balance.ts";
+import type { LoggerVariables } from "@/middleware/logger.ts";
+import type { ModelVariables } from "@/middleware/model.ts";
+import { getEstimatedPrice } from "@/utils/model-stats.ts";
+import { keyBudgetExhausted, requireFunds } from "@/utils/refusals.ts";
+import { enforceModelRateLimit } from "./model-rate-limit.ts";
+
+type GenerationAccessVariables = AuthVariables &
+    BalanceVariables &
+    ModelVariables &
+    LoggerVariables;
+
+type GenerationAccessEnv = {
+    Bindings: CloudflareBindings;
+    Variables: GenerationAccessVariables;
+};
+
+export async function checkBalance(
+    vars: GenerationAccessVariables,
+    env: CloudflareBindings,
+    model: Pick<
+        ModelVariables["model"],
+        "resolved" | "definition"
+    > = vars.model,
+): Promise<void> {
+    const { auth, balance, log } = vars;
+    if (!auth.user?.id) return;
+
+    const isPaidOnly = model.definition.paidOnly;
+    const estimatedCost = withByopMarkup(
+        getEstimatedPrice(
+            await getModelStats(env.KV, log),
+            model.resolved,
+            model.definition,
+        ),
+        Boolean(auth.apiKey?.byopMarkupApplies),
+    );
+    const userId = auth.user.id;
+    const userBalance = await requireFunds(
+        { var: vars, env },
+        estimatedCost,
+        () => balance.getBalance(userId),
+        isPaidOnly,
+        isFreeModel(model.definition),
+    );
+
+    balance.balanceCheckResult = createBalanceCheckResult(
+        userBalance,
+        isPaidOnly,
+    );
+    if (typeof auth.apiKey?.pollenBalance === "number") {
+        balance.apiKeyBudgetEstimate = Math.max(0, estimatedCost);
+    }
+}
+
+/**
+ * Wallet and key budget preflight for charges known before execution
+ * (sandbox leases) or only after it (MCP tool receipts, price 0).
+ */
+export async function requireAccountFunds(
+    c: Context<Env>,
+    price: number,
+): Promise<void> {
+    const userId = c.var.auth.requireUser().id;
+    await requireFunds(c, price, () =>
+        getFundedUserBalance(drizzle(c.env.DB), c.env.DB, userId),
+    );
+}
+
+export async function reserveApiKeyBudget(
+    vars: GenerationAccessVariables,
+    env: CloudflareBindings,
+): Promise<void> {
+    const apiKeyId = vars.auth.apiKey?.id;
+    const amount = vars.balance.apiKeyBudgetEstimate;
+    if (!apiKeyId || amount === undefined) return;
+
+    const db = drizzle(env.DB);
+    const reserved = vars.balance.apiKeyReservation?.amount ?? 0;
+    if (vars.balance.apiKeyReservation && amount <= reserved) return;
+    const reservation = await atomicReserveApiKeyBalance(
+        db,
+        apiKeyId,
+        amount - reserved,
+    );
+    if (!reservation.ok) {
+        throw keyBudgetExhausted(
+            { var: vars, env },
+            "API key budget was exhausted by another request; try again once it settles.",
+        );
+    }
+    vars.balance.apiKeyReservation = {
+        apiKeyId,
+        amount: reserved + reservation.reserved,
+    };
+}
+
+/** Catalog routes keep the existing quote; a caller choice must afford its own. */
+export async function requireModelAttemptAccess(
+    c: Context<Env>,
+    candidate: FallbackCandidate,
+): Promise<void> {
+    if (candidate.definition && c.var.model.requested.includes(",")) {
+        await checkBalance(c.var, c.env, {
+            resolved: candidate.id,
+            definition: candidate.definition,
+        });
+        await reserveApiKeyBudget(c.var, c.env);
+    }
+    await enforceModelRateLimit(c, candidate);
+}
+
+export async function releaseApiKeyBudgetReservation(
+    vars: GenerationAccessVariables,
+    env: CloudflareBindings,
+): Promise<void> {
+    const reservation = vars.balance.apiKeyReservation;
+    if (!reservation) return;
+
+    const db = drizzle(env.DB);
+    const { ok } = await atomicAdjustApiKeyBalance(
+        db,
+        reservation.apiKeyId,
+        -reservation.amount,
+    );
+    if (!ok) {
+        throw new Error(
+            `API key budget release affected 0 rows for ${reservation.apiKeyId}`,
+        );
+    }
+    vars.balance.apiKeyReservation = undefined;
+}
+
+export const apiKeyBudgetReservation = createMiddleware<GenerationAccessEnv>(
+    async (c, next) => {
+        // A caller's list reserves as each model is tried, so a reservation
+        // that fails skips only that model.
+        if (!c.var.model.requested.includes(",")) {
+            await reserveApiKeyBudget(c.var, c.env);
+        }
+        try {
+            await next();
+        } catch (error) {
+            await releaseApiKeyBudgetReservation(c.var, c.env);
+            throw error;
+        }
+    },
+);
+
+export async function requireGenerationAccess(
+    vars: GenerationAccessVariables,
+    env: CloudflareBindings,
+): Promise<void> {
+    vars.auth.requireUser();
+    vars.auth.requireModelAccess();
+    await checkBalance(vars, env);
+}
+
+/**
+ * Routes that try a caller's whole list need one model in it the caller can
+ * afford; the attempt gate skips the others. Realtime serves only the first
+ * model, so it keeps `requireGenerationAccess`.
+ */
+async function requireListAccess(
+    vars: GenerationAccessVariables,
+    env: CloudflareBindings,
+): Promise<void> {
+    if (!vars.model.requested.includes(",")) {
+        return requireGenerationAccess(vars, env);
+    }
+    vars.auth.requireUser();
+    vars.auth.requireModelAccess();
+    const listed = [
+        vars.model,
+        ...(vars.model.fallbackEntries ?? []).map((entry) => ({
+            resolved: entry.id,
+            definition: entry.definition,
+        })),
+    ];
+    let refusal: unknown;
+    for (const model of listed) {
+        try {
+            return await checkBalance(vars, env, model);
+        } catch (error) {
+            if (!(error instanceof PaymentRequiredError)) throw error;
+            refusal ??= error;
+        }
+    }
+    throw refusal;
+}
+
+export const generationAccess = createMiddleware<GenerationAccessEnv>(
+    async (c, next) => {
+        await requireListAccess(c.var, c.env);
+        await next();
+    },
+);
