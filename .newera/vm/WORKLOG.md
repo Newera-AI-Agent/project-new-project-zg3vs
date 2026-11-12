@@ -37,3 +37,6 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T13:31:35.415Z | VM 2/3] boot: VM 2/3 online (job vm-mwdl6d5x-v6ksj0of, 240 min budget, relay continuation)
 - [2026-11-12T13:31:35.416Z | VM 2/3] self-check PASS: shell: VERIFIED (the harness executed bash on this VM at boot); node: v24.22.2; npm: 11.19.1; python3: Python 3.12.3; git: repo checked out @ 29c08cc; browser: Google Chrome 156.0.8078.79 available — the browser_* tools drive it (playwright-core installs on first browser call); filesystem: WRITABLE 
 - [2026-11-12T13:31:38.610Z | VM 2/3] boot auto-setup: npm install --no-audit --no-fund ok
+- [2026-11-12T13:34:19.715Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs && echo '=== contract files ===' && ls .newera/vm/ && grep -rl 'R1' .newera/vm/*.json .
+- [2026-11-12T13:34:37.176Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations && ls node_modules/.bin | grep -i vitest; echo '--- enter pkg devDe
+- [2026-11-12T13:35:07.441Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations/enter.pollinations.ai && timeout 900 ../node_modules/.bin/vitest ru
