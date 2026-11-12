@@ -1,0 +1,180 @@
+### A. new URL( without protocol allowlist (SSRF/redirect candidates)
+shared/error.ts:128:            typeof requestUrl === "string" ? new URL(requestUrl) : requestUrl,
+shared/http/fix-link.ts:42:    const url = new URL(path, base);
+shared/public-origin.ts:9:    return new URL(c.req.url).origin;
+shared/public-origin.ts:14:    return new URL(c.req.url);
+shared/auth/api-key.ts:204:    const queryKey = new URL(request.url).searchParams.get("key");
+shared/auth/api-key.ts:254:        new URL(`/__invalid-api-key/${keyHash}`, opts.request.url),
+shared/auth/api-key-creation.ts:80:        parsed = new URL(redirectUri);
+shared/auth/redirect-uri.ts:92:        return new URL(url);
+shared/events.ts:110:    const url = new URL(referenceIngestUrl);
+shared/user-media-url.ts:35:        url = new URL(value);
+shared/community-endpoints.ts:756:        const url = new URL(value);
+shared/community-endpoints.ts:1110:    const url = new URL(value.trim());
+shared/community-media.ts:167:            requestUrl: new URL(url),
+shared/community-media.ts:175:            requestUrl: new URL(url),
+shared/community-media.ts:202:            requestUrl: new URL(url),
+shared/community-media.ts:210:            requestUrl: new URL(url),
+shared/community-endpoint-urls.ts:5:    const url = new URL(value);
+shared/community-endpoint-urls.ts:25:    const url = new URL(value);
+shared/community-endpoint-urls.ts:34:        url.hostname !== new URL(endpointBaseUrl).hostname
+shared/community-endpoint-urls.ts:72:    const url = new URL(validated);
+shared/community-endpoint-urls.ts:99:    if (configuredCommunityEndpointSuffix(new URL(validated)) === suffix) {
+shared/community-endpoint-urls.ts:102:    const url = new URL(communityOpenAIBaseUrl(validated));
+shared/vitest.config.ts:5:    root: fileURLToPath(new URL("../", import.meta.url)),
+shared/vitest.config.ts:8:            "@shared": fileURLToPath(new URL("./", import.meta.url)),
+shared/test/mocks/fetch.ts:22:        const url = new URL(request.url);
+shared/test/mocks/fetch.ts:57:                    url = new URL(request.url);
+shared/test/mocks/fetch.ts:59:                    url = typeof input === "string" ? new URL(input) : input;
+shared/test/mocks/vcr.ts:100:    const url = new URL(request.url);
+shared/test/mocks/vcr.ts:380:        params: { ...new URL(request.url).searchParams },
+shared/observability/request-inputs.ts:25:    const redacted = new URL(url);
+shared/providers.test.ts:119:                const host = new URL(endpoint).hostname;
+shared/agent-json.test.ts:11:const apps = new URL("../apps/", import.meta.url);
+shared/agent-json.test.ts:15:    .filter((file) => existsSync(new URL(file, apps)));
+shared/agent-json.test.ts:25:        } = JSON.parse(readFileSync(new URL(file, apps), "utf8"));
+enter.pollinations.ai/src/utils/product-analytics.ts:114:        const { pathname, origin, hostname } = new URL(
+enter.pollinations.ai/src/utils/stripe-billing/portal.ts:179:    const url = new URL(returnTo?.topUp ? "/top-up" : "/pollen", baseUrl);
+enter.pollinations.ai/src/index.ts:29:    const reqUrl = new URL(c.req.url);
+enter.pollinations.ai/src/index.ts:30:    const publicOrigin = new URL(getPublicOrigin(c));
+enter.pollinations.ai/src/index.ts:31:    const url = new URL(reqUrl.pathname + reqUrl.search, publicOrigin);
+enter.pollinations.ai/src/index.ts:65:        const reqUrl = new URL(c.req.url);
+enter.pollinations.ai/src/index.ts:66:        const publicOrigin = new URL(getPublicOrigin(c));
+enter.pollinations.ai/src/index.ts:67:        const url = new URL(reqUrl.pathname + reqUrl.search, publicOrigin);
+enter.pollinations.ai/src/services/client-metadata.ts:30:        const url = new URL(clientId);
+enter.pollinations.ai/src/services/quests/groups/model-usage.ts:93:    const tinybirdOrigin = new URL(env.TINYBIRD_INGEST_URL).origin;
+enter.pollinations.ai/src/services/quests/groups/app-growth.ts:177:    const tinybirdOrigin = new URL(env.TINYBIRD_INGEST_URL).origin;
+enter.pollinations.ai/src/services/quests/groups/app-growth.ts:206:    const tinybirdOrigin = new URL(env.TINYBIRD_INGEST_URL).origin;
+enter.pollinations.ai/src/services/quests/groups/agent-usage.ts:89:        new URL(env.TINYBIRD_INGEST_URL).origin,
+enter.pollinations.ai/src/services/community-endpoint-openai.ts:75:    const url = new URL(communityOpenAIBaseUrl(baseUrl));
+enter.pollinations.ai/src/services/code-agent.ts:38:    const [, owner, name] = new URL(repository).pathname.split("/");
+enter.pollinations.ai/src/services/code-agent-outbound.ts:11:    const url = new URL(request.url);
+enter.pollinations.ai/src/services/signup-domains.ts:152:        host = new URL(
+enter.pollinations.ai/src/services/account-notices.ts:107:    const url = (path: string) => new URL(path, baseUrl).toString();
+enter.pollinations.ai/src/services/account-notices.ts:176:    const unsubscribeUrl = new URL("/api/unsubscribe", env.BETTER_AUTH_URL);
+enter.pollinations.ai/src/services/listed-apps.ts:140:        new URL(env.TINYBIRD_INGEST_URL).origin,
+enter.pollinations.ai/src/services/tinybird.ts:26:    const url = new URL(path, origin);
+enter.pollinations.ai/src/routes/integrations.ts:137:            const callbackUrl = new URL(
+enter.pollinations.ai/src/routes/quest-grants.ts:31:            ["http:", "https:"].includes(new URL(value).protocol),
+enter.pollinations.ai/src/routes/x402-keys.ts:44:                    url: new URL(
+enter.pollinations.ai/src/routes/community-endpoints.ts:966:                    new URL(c.env.TINYBIRD_INGEST_URL).origin,
+enter.pollinations.ai/src/routes/docs.ts:9:            const reqUrl = new URL(c.req.url);
+
+### B. url.startsWith("http") style string-only validation
+shared/utils/public-docs.ts:12:        path.startsWith("/account/") ||
+shared/utils/public-docs.ts:14:        path.startsWith("/api/account/")
+shared/utils/public-docs.ts:26:    return path === "/x402/keys" || path.startsWith("/x402/keys/");
+shared/auth/authorize-config.ts:32:    return !!clientId?.startsWith("https://");
+enter.pollinations.ai/src/index.ts:25:    return path === "/api/docs" || path.startsWith("/api/docs/");
+enter.pollinations.ai/src/services/sites.ts:139:        const path = file.startsWith("/") ? file : `/${file}`;
+gen.pollinations.ai/src/schemas/model3d.ts:47:                        url.startsWith("http://") ||
+gen.pollinations.ai/src/schemas/model3d.ts:48:                        url.startsWith("https://"),
+gen.pollinations.ai/src/schemas/model3d.ts:85:                            url.startsWith("http://") ||
+gen.pollinations.ai/src/schemas/model3d.ts:86:                            url.startsWith("https://"),
+gen.pollinations.ai/src/schemas/image.ts:73:                        url.startsWith("http://") ||
+gen.pollinations.ai/src/schemas/image.ts:74:                        url.startsWith("https://"),
+gen.pollinations.ai/src/text/transforms/inputAudioToFireworks.ts:33:                        url: data.startsWith("https://media.pollinations.ai/")
+gen.pollinations.ai/src/index.ts:207:        path.startsWith("/docs/") ||
+gen.pollinations.ai/src/routes/docs.ts:920:        path.startsWith("/account/agents/") ||
+gen.pollinations.ai/src/routes/docs.ts:927:        path.startsWith("/account/my-models/")
+gen.pollinations.ai/src/routes/docs.ts:962:        path.startsWith("/v1/") ||
+gen.pollinations.ai/src/routes/docs.ts:964:        path.startsWith("/image/") ||
+gen.pollinations.ai/src/routes/docs.ts:966:        path.startsWith("/text/") ||
+gen.pollinations.ai/src/routes/docs.ts:968:        path.startsWith("/audio/") ||
+gen.pollinations.ai/src/routes/docs.ts:970:        path.startsWith("/video/") ||
+gen.pollinations.ai/src/routes/docs.ts:972:        path.startsWith("/generate/")
+
+### C. Math.random / weak randomness
+gen.pollinations.ai/src/routes/images.ts:117:        seed: opts.seed ?? Math.floor(Math.random() * 2147483647),
+gen.pollinations.ai/src/image/availableServers.ts:116:    let r = Math.random() * total;
+
+### D. timing-safe compare absent / == secret compare
+shared/auth/agent-run-token.ts:2:import { createHmac, timingSafeEqual } from "node:crypto";
+shared/auth/agent-run-token.ts:159:        expected.length === actual.length && timingSafeEqual(expected, actual)
+enter.pollinations.ai/src/services/account-notices.ts:2:import { createHmac, timingSafeEqual } from "node:crypto";
+enter.pollinations.ai/src/services/account-notices.ts:80:        expected.length === actual.length && timingSafeEqual(expected, actual)
+gen.pollinations.ai/src/routes/docs.ts:506:      if (apiKey === docsKey) return;
+gen.pollinations.ai/src/image/handler.ts:509:    if (typeof body.token === "string") return body.token;
+
+### E. raw fetch of user-controlled URL (SSRF)
+shared/community-media.ts:157:        response = await fetch(url, {
+shared/community-media.ts:192:        response = await fetch(url, {
+enter.pollinations.ai/src/services/community-endpoint-openai.ts:90:        response = await fetch(url, {
+enter.pollinations.ai/src/services/community-endpoint-openai.ts:543:        return await fetch(url, {
+enter.pollinations.ai/src/services/tinybird.ts:46:    const response = await fetch(url.toString(), {
+gen.pollinations.ai/src/userImage.ts:197:        response = await fetch(url, {
+gen.pollinations.ai/src/routes/audio.ts:255:        response = await fetch(url, {
+gen.pollinations.ai/src/routes/audio.ts:548:        await fetch(endpoint, {
+gen.pollinations.ai/src/routes/audio.ts:624:        await fetch(endpoint, {
+gen.pollinations.ai/src/routes/audio.ts:739:        await fetch(endpoint, {
+gen.pollinations.ai/src/routes/audio.ts:801:        await fetch(endpoint, {
+gen.pollinations.ai/src/routes/audio.ts:1190:        await fetch(endpoint, {
+gen.pollinations.ai/src/routes/audio.ts:2115:    const rawResponse = await fetch(endpoint, {
+gen.pollinations.ai/src/routes/audio.ts:2600:        await fetch(url, {
+gen.pollinations.ai/src/routes/audio.ts:2936:        const response = await fetch(endpoint, {
+gen.pollinations.ai/src/routes/audio.ts:3135:        await fetch(endpoint, {
+gen.pollinations.ai/src/routes/audio.ts:3454:        await fetch(endpoint, {
+gen.pollinations.ai/src/routes/model-status.ts:18:    const upstream = await fetch(url, {
+gen.pollinations.ai/src/routes/model-status.ts:124:        const upstream = await fetch(url, {
+gen.pollinations.ai/src/routes/azure-sandboxes.ts:119:    const response = await fetch(url, { ...init, headers });
+gen.pollinations.ai/src/routes/azure-sandboxes.ts:160:        const response = await fetch(url).catch(() => null);
+gen.pollinations.ai/src/audio/mai-transcription.ts:92:        await fetch(url, {
+gen.pollinations.ai/src/audio/lyria.ts:71:            await fetch(endpoint, {
+gen.pollinations.ai/src/audio/stem-separation.ts:143:                await fetch(endpoint, {
+gen.pollinations.ai/src/embeddings/hosted.ts:49:    const response = await fetch(endpoint, {
+gen.pollinations.ai/src/embeddings/vertex.ts:61:    const response = await fetch(url, {
+gen.pollinations.ai/src/embeddings/cohereBedrock.ts:53:    const response = await fetch(url, { method: "POST", headers, body }).catch(
+gen.pollinations.ai/src/embeddings/cohereAzure.ts:71:    const response = await fetch(endpoint, {
+gen.pollinations.ai/src/embeddings/openai.ts:54:    const response = await fetch(endpoint, {
+gen.pollinations.ai/src/model3d/models/inferenceportClient.ts:163:        response = await fetch(url, {
+gen.pollinations.ai/src/model3d/modelUtils.ts:41:    const response = await fetch(url);
+gen.pollinations.ai/src/image/models/inferencePortImageModel.ts:79:    const response = await fetch(endpoint, {
+gen.pollinations.ai/src/image/models/openRouterVideoModel.ts:328:        const response = await fetch(url, {
+gen.pollinations.ai/src/image/models/xaiVideoModel.ts:34:        const response = await fetch(url, {
+gen.pollinations.ai/src/image/models/azureFluxKontextModel.ts:356:    const response = await fetch(endpoint, {
+gen.pollinations.ai/src/image/models/azureFluxKontextModel.ts:495:    const response = await fetch(endpoint, {
+gen.pollinations.ai/src/image/models/azureMaiImageModel.ts:165:    const response = await fetch(endpoint, { method: "POST", headers, body });
+gen.pollinations.ai/src/image/createAndReturnImages.ts:797:        response = await fetch(endpoint, {
+gen.pollinations.ai/src/image/createAndReturnImages.ts:812:        response = await fetch(endpoint, {
+
+### F. JSON.parse without try/catch nearby
+shared/error.ts:137:        const parsed = JSON.parse(body);
+shared/auth/api-key-metadata.ts:6:        const parsed = JSON.parse(raw);
+shared/community-endpoints.ts:858:        parsed = raw === null ? null : JSON.parse(raw);
+shared/test/mocks/snapshot-server.ts:32:                        return c.json(JSON.parse(content));
+shared/test/mocks/vcr.ts:70:        const body = JSON.parse(text || "{}");
+shared/test/mocks/vcr.ts:223:                data: JSON.parse(text),
+shared/test/mocks/tinybird.ts:184:        .map((line) => JSON.parse(line) as T);
+shared/agents/responses.ts:229:                    JSON.parse(call.arguments),
+shared/agents/responses.ts:272:                output = z.json().parse(JSON.parse(outputText));
+shared/agents/responses.ts:313:                    input: JSON.parse(call.arguments),
+shared/agent-json.test.ts:25:        } = JSON.parse(readFileSync(new URL(file, apps), "utf8"));
+enter.pollinations.ai/src/services/client-metadata.ts:58:        const doc = ClientMetadataSchema.parse(JSON.parse(text));
+enter.pollinations.ai/src/services/prompt-agent.ts:16:        const parsed = PromptAgentConfigSchema.safeParse(JSON.parse(raw));
+enter.pollinations.ai/src/services/community-endpoint-openai.ts:128:        return JSON.parse(text);
+enter.pollinations.ai/src/routes/github-secret-scanning.ts:108:            payload = JSON.parse(rawBody);
+enter.pollinations.ai/src/routes/account.ts:295:        return JSON.parse(raw);
+gen.pollinations.ai/src/utils/text-cache.ts:51:            const event = JSON.parse(line.slice("data:".length).trim());
+gen.pollinations.ai/src/utils/text-cache.ts:110:            const bodyObj = JSON.parse(bodyText);
+gen.pollinations.ai/src/text/chat/public.ts:100:                                    JSON.parse(data) as ChatCompletion,
+gen.pollinations.ai/src/text/chat/usage.ts:51:                event = JSON.parse(message.data);
+gen.pollinations.ai/src/text/cohereCommandAPlus.ts:152:            chunk = JSON.parse(event.data) as Record<string, unknown>;
+gen.pollinations.ai/src/text/vercelSearch.ts:119:            const chunk = JSON.parse(event.data) as ChatCompletion;
+gen.pollinations.ai/src/text/responses/chatResponse.ts:473:                        payload = JSON.parse(event.data) as JsonObject;
+gen.pollinations.ai/src/text/responses/client.ts:123:        return JSON.parse(text);
+gen.pollinations.ai/src/text/responses/adaptedChat.ts:870:                chunk = JSON.parse(event.data);
+gen.pollinations.ai/src/text/responses/stream.ts:29:                event = JSON.parse(message.data);
+gen.pollinations.ai/src/text/agents/mcp.ts:86:            output = JSON.parse(item.output);
+gen.pollinations.ai/src/text/genericOpenAIClient.ts:165:                            const completion = JSON.parse(
+gen.pollinations.ai/src/text/genericOpenAIClient.ts:381:        return JSON.parse(text);
+gen.pollinations.ai/src/text/genericOpenAIClient.ts:596:            data = JSON.parse(responseBody) as ChatCompletion;
+gen.pollinations.ai/src/text/systemOneClient.ts:251:        payload = JSON.parse(message.content);
+gen.pollinations.ai/src/text/messages/translate.ts:397:    return JSON.parse(argumentsJson || "{}");
+gen.pollinations.ai/src/text/messages/stream.ts:226:                        onChunk(JSON.parse(event.data) as ChatChunk);
+gen.pollinations.ai/src/routes/generation-handlers.ts:205:                JSON.parse(responseText),
+gen.pollinations.ai/src/routes/docs.ts:361:    'ws.on("message", (m) => console.log(JSON.parse(m.toString())));',
+gen.pollinations.ai/src/routes/realtime.ts:645:        return JSON.parse(data);
+gen.pollinations.ai/src/routes/audio.ts:1628:        return JSON.parse(value);
+gen.pollinations.ai/src/routes/audio.ts:4397:            whisper = JSON.parse(await response.text());
+gen.pollinations.ai/src/routes/messages.ts:73:        return JSON.parse(text).error?.message ?? text;
+gen.pollinations.ai/src/routes/e2b.ts:197:        return text ? JSON.parse(text) : {};
