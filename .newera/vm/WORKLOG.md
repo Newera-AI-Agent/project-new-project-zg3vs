@@ -30,3 +30,4 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T13:00:07.009Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== all test files (non node_modules) ==='; find . -path ./no
 - [2026-11-12T13:12:21.562Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== validateUserMediaUrl call sites ==='; grep -rn "validateU
 - [2026-11-12T13:13:14.040Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== shared/user-media-url.ts ==='; cat -n shared/user-media-u
+- [2026-11-12T13:19:13.964Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs echo '=== POC-RECIPE ==='; cat .newera/cyber/engagement/POC-RECIPE.md echo '=== run-poc
