@@ -1,0 +1,21 @@
+{
+  "name": "pollinations-security-assessment",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Authorized ethical security assessment of pollinations/pollinations — verified PoCs and issue reports",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "vitest run --dir poc",
+    "poc": "vitest run --dir poc",
+    "poc:list": "node scripts/list-pocs.mjs"
+  },
+  "devDependencies": {
+    "tsx": "4.20.6",
+    "vitest": "4.1.12"
+  },
+  "dependencies": {
+    "hono": "4.10.6",
+    "zod": "4.5.4"
+  }
+}
