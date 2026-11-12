@@ -53,3 +53,5 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T13:59:37.884Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs && python3 - <<'PY' import re,io p='scripts/build.mjs' s=open(p).read() old='''for (con
 - [2026-11-12T14:03:24.147Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs && python3 - <<'PY' brief = r'''# WAVE BRIEF — pollinations/pollinations authorized sec
 - [2026-11-12T14:06:49.382Z | VM 2/3] PLAN updated: 22 steps
+- [2026-11-12T14:09:49.086Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs && echo '=== root vitest.poc.config.ts ===' && cat target/pollinations/vitest.poc.confi
+- [2026-11-12T14:10:08.726Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations && ls node_modules/.bin/ | grep -i -E 'vitest|wrangler' ; echo '---
