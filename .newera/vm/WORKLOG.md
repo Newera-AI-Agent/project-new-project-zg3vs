@@ -32,3 +32,4 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T13:13:14.040Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== shared/user-media-url.ts ==='; cat -n shared/user-media-u
 - [2026-11-12T13:19:13.964Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs echo '=== POC-RECIPE ==='; cat .newera/cyber/engagement/POC-RECIPE.md echo '=== run-poc
 - [2026-11-12T13:21:41.802Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== shared vitest config ==='; cat shared/vitest.config.ts ec
+- [2026-11-12T13:29:15.443Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== request-inputs.ts ==='; cat -n shared/observability/reque
