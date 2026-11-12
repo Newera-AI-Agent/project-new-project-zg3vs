@@ -51,3 +51,4 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T13:56:59.202Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs && cat scripts/build.mjs && echo '=== ROOT node_modules ===' && ls node_modules/.bin 2>
 - [2026-11-12T13:57:34.698Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations/enter.pollinations.ai && ls test/ | head -30 && echo '=== run one u
 - [2026-11-12T13:59:37.884Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs && python3 - <<'PY' import re,io p='scripts/build.mjs' s=open(p).read() old='''for (con
+- [2026-11-12T14:03:24.147Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs && python3 - <<'PY' brief = r'''# WAVE BRIEF — pollinations/pollinations authorized sec
