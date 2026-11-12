@@ -21,3 +21,6 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T12:10:19.388Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs echo '=== root pkg ==='; cat package.json echo '=== scripts dir ==='; ls -la scripts/ 2
 - [2026-11-12T12:12:42.824Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations ls echo '--- enter node_modules? ---'; ls enter.pollinations.ai/nod
 - [2026-11-12T12:15:38.261Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs echo '=== PLAN.json ==='; cat .newera/vm/PLAN.json | head -80 echo '=== run-pocs.mjs ==
+- [2026-11-12T12:45:33.790Z | VM 1/3] PLAN updated: 34 steps
+- [2026-11-12T12:45:45.527Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs mkdir -p .newera/cyber cat > .newera/cyber/scope.json <<'EOF' {   "targets": ["loopback
+- [2026-11-12T12:46:11.442Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations ( cd gen.pollinations.ai && timeout 300 npx vitest run test/agent-r
