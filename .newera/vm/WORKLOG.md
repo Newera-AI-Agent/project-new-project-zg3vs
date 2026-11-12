@@ -67,3 +67,4 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T15:12:52.239Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations/media.pollinations.ai && timeout 400 npx vitest run test/poc/wave00
 - [2026-11-12T15:15:16.472Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs && echo '=== shared vitest.poc.config.ts ===' && cat target/pollinations/shared/vitest.
 - [2026-11-12T15:30:38.429Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations && echo '=== existing poc dirs ===' && ls -d */test/poc poc 2>/dev/
+- [2026-11-12T16:07:00.830Z | VM 2/3] ABORT (model endpoint failure) at step 99 — handoff written for resume.
