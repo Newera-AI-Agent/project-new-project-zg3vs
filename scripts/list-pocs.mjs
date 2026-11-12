@@ -34,8 +34,8 @@ function walk(dir) {
 }
 
 const rows = [];
-for (const f of walk(path.join(ROOT, "poc"))) {
-    rows.push({ tier: "root", worker: "shared", file: path.relative(ROOT, f) });
+for (const f of walk(path.join(TARGET, "poc"))) {
+    rows.push({ tier: "root", worker: "root", file: path.relative(ROOT, f) });
 }
 for (const [worker, dir] of Object.entries(WORKER_DIR)) {
     for (const f of walk(path.join(TARGET, dir, "test", "poc"))) {
