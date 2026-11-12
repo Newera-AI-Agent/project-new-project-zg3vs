@@ -17,3 +17,4 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T11:24:08.719Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs echo '=== root package.json ==='; cat package.json echo '=== root node_modules key pkgs
 - [2026-11-12T11:25:37.863Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== enter vitest.config.ts ==='; cat enter.pollinations.ai/vi
 - [2026-11-12T11:40:35.987Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs echo '=== scope.json ==='; cat .newera/cyber/scope.json echo '=== engagement tree ===';
+- [2026-11-12T11:54:46.996Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs cat target/pollinations/enter.pollinations.ai/vitest.config.ts echo '=== root package.j
