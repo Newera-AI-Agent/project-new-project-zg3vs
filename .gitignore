@@ -1,0 +1,8 @@
+node_modules/
+.newera/cyber/corpora/
+.newera/browser/
+target/pollinations/node_modules/
+target/pollinations/**/node_modules/
+target/pollinations/.wrangler/
+*.log
+.DS_Store
