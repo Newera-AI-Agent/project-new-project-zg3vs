@@ -7,3 +7,4 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T10:21:39.527Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== LOC by service ===' for d in shared enter.pollinations.ai
 - [2026-11-12T10:27:35.387Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== tsconfig files ==='; ls tsconfig*.json */tsconfig*.json 2
 - [2026-11-12T10:31:51.474Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== gen vitest config ==='; cat gen.pollinations.ai/vitest.co
+- [2026-11-12T10:39:11.293Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== workerd present? ==='; ls node_modules/@cloudflare/ 2>/de
