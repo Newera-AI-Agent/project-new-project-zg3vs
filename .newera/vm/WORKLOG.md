@@ -41,3 +41,5 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T13:34:37.176Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations && ls node_modules/.bin | grep -i vitest; echo '--- enter pkg devDe
 - [2026-11-12T13:35:07.441Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations/enter.pollinations.ai && timeout 900 ../node_modules/.bin/vitest ru
 - [2026-11-12T13:39:36.253Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations && for w in shared gen.pollinations.ai media.pollinations.ai; do ec
+- [2026-11-12T13:40:04.511Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs && echo '=== run-pocs.mjs ===' && cat scripts/run-pocs.mjs && echo '=== list-pocs.mjs =
+- [2026-11-12T13:40:47.951Z | VM 2/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations && echo '=== enter cfg 100-130 ===' && sed -n '100,130p' enter.poll
