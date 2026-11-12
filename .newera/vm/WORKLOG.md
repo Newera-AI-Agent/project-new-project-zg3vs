@@ -11,3 +11,4 @@ Durable session memory for this VM job chain. Each line is one step or wind-down
 - [2026-11-12T10:46:36.739Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations/enter.pollinations.ai echo '=== apply-migrations setup ==='; cat te
 - [2026-11-12T10:48:49.383Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations/enter.pollinations.ai echo '=== vitest.config.ts FULL ==='; cat vit
 - [2026-11-12T10:59:40.676Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== versions ==='; node -p "const p=require('./package.json')
+- [2026-11-12T11:01:04.832Z | VM 1/3] VERIFIED green: cd /home/runner/work/project-new-project-zg3vs/project-new-project-zg3vs/target/pollinations echo '=== plugin deps ==='; node -p "JSON.stringify(require('./node
